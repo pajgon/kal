@@ -2,6 +2,7 @@ const calculator = {
   displayValue: "0",
   firstOperand: null,
   waitingForSecondOporand: false,
+  secondOperand: null,
   operator: null
 };
 function updateDisplay() {
@@ -19,7 +20,10 @@ function inputDigit(digit) {
 const keys = document.querySelector(".calculator-keys");
 keys.addEventListener("click", event => {
   const { target } = event;
-  if (!target.matches("button")) {
+  if (target.matches("button")) {
+    return value;
+  }
+  if (!target.classList.contains("button")) {
     return;
   }
   if (target.classList.contains("operator")) {
@@ -28,7 +32,38 @@ keys.addEventListener("click", event => {
   if (target.classList.contains("all-clear")) {
     return;
   }
+  if (target.classList.contains("decimal")) {
+    return;
+  }
 
   inputDigit(target.value);
   updateDisplay();
+
+  function handleOperator(nextOperator) {
+    if (calculator.firstOperand == null) {
+      calculator.firstOperand = parseFloat(calculator.displayValue);
+      calculator.displayValue == "0";
+      updateDisplay();
+    } else if (calculator.operator) {
+      const result = performCalculation[calculator.operator](
+        calculator.firstOperand,
+        parseFloat(calculator.displayValue)
+      );
+
+      calculator.displayValue = String(result);
+      calculator.firstOperand = result;
+    }
+    calculator.waitingForSecondOporand = true;
+    calculator.firstOperand = nextOperator;
+  }
+
+  const performCalculation = {
+    "/": (firstOperand, secondOperand) => firstOperand / secondOperand,
+    "*": (firstOperand, secondOperand) => firstOperand * secondOperand,
+    "+": (firstOperand, secondOperand) => firstOperand + secondOperand,
+    "-": (firstOperand, secondOperand) => firstOperand - secondOperand,
+    "=": (firstOperand, secondOperand) => secondOperand
+  };
+  updateDisplay();
+  function resetCalculator() {}
 });
